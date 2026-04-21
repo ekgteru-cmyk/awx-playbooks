@@ -1,0 +1,9 @@
+---
+- name: Postfixのインストール作業
+  hosts: all
+  become: yes
+  tasks:
+    - name: Postfixパッケージをインストールする
+      ansible.builtin.dnf:
+        name: postfix
+        state: present
