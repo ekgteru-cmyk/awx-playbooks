@@ -2,6 +2,7 @@
 - name: Postfixのインストール作業
   hosts: all
   become: yes
+  gather_facts: no  # ←ここを追記！調査をスキップします
   tasks:
     - name: Postfixパッケージをインストールする
       ansible.builtin.dnf:
