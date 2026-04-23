@@ -1,9 +1,30 @@
 ---
-- name: Postfixのインストール作業
+- name: Nginxコンテナの自動構築
   hosts: all
-  gather_facts: yes
+  become: yes  # root権限で実行する
   tasks:
-    - name: Postfixをインストール
-      ansible.builtin.dnf:
-        name: postfix
+    - name: Pythonのpipをインストール (AnsibleのDocker操作に必要)
+      dnf:
+        name: python3-pip
         state: present
+
+    - name: Docker SDK for Pythonをインストール
+      pip:
+        name: docker
+        state: present
+
+    - name: HTTP(80番)ポートを開放する (ファイアウォール設定)
+      ansible.posix.firewalld:
+        port: 80/tcp
+        permanent: yes
+        state: enabled
+        immediate: yes
+
+    - name: Nginxコンテナを起動する
+      community.docker.docker_container:
+        name: my-nginx
+        image: nginx:latest
+        state: started
+        restart_policy: always
+        ports:
+          - "80:80"
