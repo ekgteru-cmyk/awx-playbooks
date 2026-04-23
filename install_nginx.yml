@@ -13,14 +13,6 @@
         executable: pip3.9
         state: present
 
-    - name: HTTP(80番)ポートを開放する (直接コマンドで実行)
-      command: firewall-cmd --add-port=80/tcp --permanent
-      changed_when: false
-
-    - name: ファイアウォールの設定を反映
-      command: firewall-cmd --reload
-      changed_when: false
-
     - name: Nginxコンテナを起動する
       community.docker.docker_container:
         name: my-nginx
