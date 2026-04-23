@@ -1,24 +1,25 @@
 ---
 - name: Nginxコンテナの自動構築
   hosts: all
-  become: yes  # root権限で実行する
+  become: yes
   tasks:
-    - name: Pythonのpipをインストール (AnsibleのDocker操作に必要)
-      dnf:
-        name: python3-pip
-        state: present
+    - name: Docker SDK for Pythonの準備 (直接コマンドで実行)
+      command: dnf install -y python39-pip
+      changed_when: false
 
-    - name: Docker SDK for Pythonをインストール
+    - name: Docker SDK for Pythonをインストール (Python3.9用)
       pip:
         name: docker
+        executable: pip3.9
         state: present
 
-    - name: HTTP(80番)ポートを開放する (ファイアウォール設定)
-      ansible.posix.firewalld:
-        port: 80/tcp
-        permanent: yes
-        state: enabled
-        immediate: yes
+    - name: HTTP(80番)ポートを開放する (直接コマンドで実行)
+      command: firewall-cmd --add-port=80/tcp --permanent
+      changed_when: false
+
+    - name: ファイアウォールの設定を反映
+      command: firewall-cmd --reload
+      changed_when: false
 
     - name: Nginxコンテナを起動する
       community.docker.docker_container:
